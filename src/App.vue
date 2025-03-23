@@ -40,10 +40,56 @@ const addUser = () => {
 
   newUsername.value = ''
 }
+
+const tasks = ref([
+  {
+    id: 1,
+    text: 'Make todo list',
+    cssProperty: 'task task--completed',
+  },
+  {
+    id: 2,
+    text: 'Go skydiving',
+    cssProperty: 'task',
+  },
+  {
+    id: 3,
+    text: 'Go run',
+    cssProperty: 'task task--completed',
+  },
+])
+
+const counter = ref('')
+const newTask = ref('')
+
+const deleteTask = (id) => {
+  tasks.value = tasks.value.filter((task) => task.id !== id)
+}
+
+const deleteCompletedTasks = () => {
+  tasks.value = tasks.value.filter((task) => task.cssProperty !== 'task task--completed')
+}
+
+const deleteAllTasks = () => {
+  tasks.value.length = 0
+}
+
+const addTask = () => {
+  if (newTask.value === '') return
+
+  tasks.value.push({
+    id: tasks.value.length + 1,
+    text: newTask.value,
+    cssProperty: 'task',
+  })
+
+  newTask.value = ''
+}
 </script>
 
 <template>
-  <!-- <div>ЗНАЧЕНИЕ ТЕКУЩЕЕ ИНПУТА: {{ newUsername }}</div>
+  <div>ЗНАЧЕНИЕ ТЕКУЩЕЕ ИНПУТА: {{ newUsername }}</div>
+
   <form @submit.prevent="addUser">
     <label>
       Введите имя
@@ -55,7 +101,7 @@ const addUser = () => {
     <div @click="deleteUser(user.id)">X</div>
     <div class="user-img">{{ user.id }}</div>
     <div class="username">{{ user.name }}</div>
-  </div> -->
+  </div>
 
   <div class="container-wr">
     <div class="container">
@@ -63,12 +109,16 @@ const addUser = () => {
         <p>Tasks</p>
         <div>(<span>1</span>)</div>
       </div>
-      <div class="create-task">
-        <input type="text" name="name" placeholder="New task" />
+
+      <form @submit.prevent="addTask" class="create-task">
+        <input v-model="newTask" type="text" name="name" placeholder="New task" />
         <button>+ Add</button>
-      </div>
+      </form>
+      <div>ЗНАЧЕНИЕ ТЕКУЩЕЕ ИНПУТА: {{ newTask }}</div>
+      <div>ЗНАЧЕНИЕ ТЕКУЩЕЕ переменной tasks: {{ tasks }}</div>
+
       <div class="clear">
-        <button class="clear__completed">
+        <button @click="deleteCompletedTasks" class="clear__completed">
           <svg x="0px" y="0px" width="100" height="100" viewBox="0,0,256,256">
             <g
               fill="none"
@@ -100,32 +150,27 @@ const addUser = () => {
           </svg>
           Clear Completed
         </button>
-        <button class="clear__all">Clear All</button>
+        <button @click="deleteAllTasks" class="clear__all">Clear All</button>
       </div>
-      <div class="task task--completed">
-        <input type="text" name="name" placeholder="Make todo list" />
+      <!-- <div class="task task--completed">
+        <input type="text" name="name" placeholder="{{ user.id }}" />
         <button>
-          <!-- <svg version="1" viewBox="0 0 24 24">
+          <svg version="1" viewBox="0 0 24 24">
             <path d="M13 12l5-5-1-1-5 5-5-5-1 1 5 5-5 5 1 1 5-5 5 5 1-1z"></path>
-          </svg> -->
+          </svg> 
           x
         </button>
-      </div>
-      <div class="task">
-        <input type="text" name="name" placeholder="Go skydiving" />
-        <button>
-          <!-- <svg version="1" viewBox="0 0 24 24">
-            <path d="M13 12l5-5-1-1-5 5-5-5-1 1 5 5-5 5 1 1 5-5 5 5 1-1z"></path>
-          </svg> -->
-          x
-        </button>
+      </div> -->
+      <div v-for="task in tasks" v-bind:class="task.cssProperty">
+        <input v-bind:placeholder="task.text" type="text" />
+        <button @click="deleteTask(task.id)">x</button>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* .user-card {
+.user-card {
   display: flex;
   width: 200px;
   height: 300px;
@@ -144,7 +189,7 @@ const addUser = () => {
   flex-grow: 1;
   border: 1px solid black;
   width: 100%;
-} */
+}
 
 *,
 *::before,
