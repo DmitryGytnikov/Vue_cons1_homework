@@ -1,73 +1,50 @@
 <script setup>
 import { ref } from 'vue'
 
-const users = ref([
-  {
-    id: 1,
-    name: 'Vasya',
-  },
-  // {
-  // 	id: 2,
-  // 	name: "Petya",
-  // },
-  // {
-  // 	id: 3,
-  // 	name: "Masha",
-  // },
-  // {
-  // 	id: 4,
-  // 	name: "Sasha",
-  // },
-  // {
-  // 	id: 5,
-  // 	name: "Vanya",
-  // },
-])
-
-const newUsername = ref('')
-
-const deleteUser = (id) => {
-  users.value = users.value.filter((user) => user.id !== id)
-}
-
-const addUser = () => {
-  if (newUsername.value === '') return
-
-  users.value.push({
-    id: users.value.length + 1,
-    name: newUsername.value,
-  })
-
-  newUsername.value = ''
-}
-
 const tasks = ref([
   {
-    id: 1,
+    id: 0,
     text: 'Make todo list',
     cssProperty: 'task task--completed',
   },
   {
-    id: 2,
+    id: 1,
     text: 'Go skydiving',
     cssProperty: 'task',
   },
   {
-    id: 3,
+    id: 2,
     text: 'Go run',
-    cssProperty: 'task task--completed',
+    cssProperty: 'task',
   },
 ])
 
 const counter = ref('')
+
 const newTask = ref('')
 
 const deleteTask = (id) => {
   tasks.value = tasks.value.filter((task) => task.id !== id)
+
+  for (let i = 0; i < tasks.value.length; i++) {
+    tasks.value[i].id = i
+  }
+}
+
+const switchCssProperty = (id) => {
+  if (tasks.value[id].cssProperty === 'task task--completed') {
+    tasks.value[id].cssProperty = 'task'
+  } else {
+    tasks.value[id].cssProperty = 'task task--completed'
+  }
 }
 
 const deleteCompletedTasks = () => {
   tasks.value = tasks.value.filter((task) => task.cssProperty !== 'task task--completed')
+
+  for (let i = 0; i < tasks.value.length; i++) {
+    tasks.value[i].id = i
+  }
 }
 
 const deleteAllTasks = () => {
@@ -83,39 +60,34 @@ const addTask = () => {
     cssProperty: 'task',
   })
 
+  for (let i = 0; i < tasks.value.length; i++) {
+    tasks.value[i].id = i
+    // console.log(i)
+  }
+
   newTask.value = ''
 }
 </script>
 
 <template>
-  <div>ЗНАЧЕНИЕ ТЕКУЩЕЕ ИНПУТА: {{ newUsername }}</div>
-
-  <form @submit.prevent="addUser">
-    <label>
-      Введите имя
-      <input v-model="newUsername" type="text" />
-      <button>Добавить</button>
-    </label>
-  </form>
-  <div v-for="user in users" class="user-card">
-    <div @click="deleteUser(user.id)">X</div>
-    <div class="user-img">{{ user.id }}</div>
-    <div class="username">{{ user.name }}</div>
-  </div>
-
   <div class="container-wr">
     <div class="container">
       <div class="counter">
         <p>Tasks</p>
-        <div>(<span>1</span>)</div>
+        <div>
+          (
+          <span>{{ tasks.length }}</span>
+          )
+        </div>
       </div>
 
       <form @submit.prevent="addTask" class="create-task">
         <input v-model="newTask" type="text" name="name" placeholder="New task" />
         <button>+ Add</button>
       </form>
-      <div>ЗНАЧЕНИЕ ТЕКУЩЕЕ ИНПУТА: {{ newTask }}</div>
-      <div>ЗНАЧЕНИЕ ТЕКУЩЕЕ переменной tasks: {{ tasks }}</div>
+
+      <!-- <div>Значение текущее инпута новой задачи: {{ newTask }}</div> -->
+      <!-- <div>Значение текущее переменной tasks: {{ tasks }}</div> -->
 
       <div class="clear">
         <button @click="deleteCompletedTasks" class="clear__completed">
@@ -152,17 +124,13 @@ const addTask = () => {
         </button>
         <button @click="deleteAllTasks" class="clear__all">Clear All</button>
       </div>
-      <!-- <div class="task task--completed">
-        <input type="text" name="name" placeholder="{{ user.id }}" />
-        <button>
-          <svg version="1" viewBox="0 0 24 24">
-            <path d="M13 12l5-5-1-1-5 5-5-5-1 1 5 5-5 5 1 1 5-5 5 5 1-1z"></path>
-          </svg> 
-          x
-        </button>
-      </div> -->
       <div v-for="task in tasks" v-bind:class="task.cssProperty">
-        <input v-bind:placeholder="task.text" type="text" />
+        <input
+          v-bind:placeholder="task.text"
+          @click="switchCssProperty(task.id)"
+          type="text"
+          readonly
+        />
         <button @click="deleteTask(task.id)">x</button>
       </div>
     </div>
@@ -170,27 +138,6 @@ const addTask = () => {
 </template>
 
 <style scoped>
-.user-card {
-  display: flex;
-  width: 200px;
-  height: 300px;
-  border: solid 1px black;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 30px;
-}
-.user-img {
-  width: 100%;
-  height: 70%;
-  border: 1px solid black;
-}
-.username {
-  flex-grow: 1;
-  border: 1px solid black;
-  width: 100%;
-}
-
 *,
 *::before,
 *::after {
@@ -300,15 +247,13 @@ const addTask = () => {
   display: block;
   cursor: pointer;
 
-  /* transform: translateY(1px); */
-
   transition: all 0.2s ease;
 }
+
 .create-task button:hover,
 .create-task button:focus,
 .create-task button:active {
   background-color: #1583cc;
-  /* background-color: red; */
 }
 
 .clear {
@@ -342,8 +287,6 @@ const addTask = () => {
 
   cursor: pointer;
 
-  /* transform: translateY(1px); */
-
   transition: all 0.2s ease;
 }
 
@@ -351,7 +294,6 @@ const addTask = () => {
 .clear__completed:focus,
 .clear__completed:active {
   background-color: #cc8b00;
-  /* background-color: red; */
 }
 
 .clear__completed svg {
@@ -377,8 +319,6 @@ const addTask = () => {
 
   cursor: pointer;
 
-  /* transform: translateY(1px); */
-
   transition: all 0.2s ease;
 }
 
@@ -391,7 +331,6 @@ const addTask = () => {
 .task {
   display: flex;
   width: 100%;
-  /* align-items: stretch; */
 
   margin-bottom: 8px;
 }
@@ -414,6 +353,7 @@ const addTask = () => {
   box-shadow: inset 0 1px 2px hsla(0, 0%, 4%, 0.1);
 
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .task input::placeholder {
@@ -422,7 +362,6 @@ const addTask = () => {
   font-weight: 400;
   font-size: 1rem;
   color: #0a0a0a;
-  /* opacity: 0.4; */
 }
 
 .task input:hover,
@@ -449,8 +388,6 @@ const addTask = () => {
   display: block;
   cursor: pointer;
 
-  /* transform: translateY(1px); */
-
   transition: all 0.2s ease;
 }
 
@@ -458,16 +395,12 @@ const addTask = () => {
 .task button:focus,
 .task button:active {
   background-color: #da3116;
-  /* background-color: red; */
 }
 
 .task--completed input {
   text-decoration: line-through;
   background-color: rgba(0, 128, 0, 0.15);
   border-color: rgb(242 242 242);
-}
-
-.task--completed input::placeholder {
 }
 
 .task--completed input:hover,
