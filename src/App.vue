@@ -19,9 +19,21 @@ const tasks = ref([
   },
 ])
 
-const counter = ref('')
-
 const newTask = ref('')
+
+let counter = 2 //
+
+const countTasks = () => {
+  counter = 0
+  for (let i = 0; i < tasks.value.length; i++) {
+    // console.log(i)
+    if (tasks.value[i].cssProperty === 'task') {
+      counter = counter + 1
+    }
+  }
+}
+
+countTasks()
 
 const deleteTask = (id) => {
   tasks.value = tasks.value.filter((task) => task.id !== id)
@@ -29,13 +41,17 @@ const deleteTask = (id) => {
   for (let i = 0; i < tasks.value.length; i++) {
     tasks.value[i].id = i
   }
+
+  countTasks()
 }
 
 const switchCssProperty = (id) => {
   if (tasks.value[id].cssProperty === 'task task--completed') {
     tasks.value[id].cssProperty = 'task'
+    countTasks()
   } else {
     tasks.value[id].cssProperty = 'task task--completed'
+    countTasks()
   }
 }
 
@@ -45,15 +61,18 @@ const deleteCompletedTasks = () => {
   for (let i = 0; i < tasks.value.length; i++) {
     tasks.value[i].id = i
   }
+
+  countTasks()
 }
 
 const deleteAllTasks = () => {
   tasks.value.length = 0
+  countTasks()
 }
 
 const addTask = () => {
   if (newTask.value === '') return
-
+  // if (newTask.value === '') {
   tasks.value.push({
     id: tasks.value.length + 1,
     text: newTask.value,
@@ -66,6 +85,9 @@ const addTask = () => {
   }
 
   newTask.value = ''
+
+  countTasks()
+  // }
 }
 </script>
 
@@ -76,7 +98,8 @@ const addTask = () => {
         <p>Tasks</p>
         <div>
           (
-          <span>{{ tasks.length }}</span>
+          <!-- <span>{{ tasks.length }}</span> -->
+          <span>{{ counter }}</span>
           )
         </div>
       </div>
@@ -149,17 +172,16 @@ const addTask = () => {
 
 .container-wr {
   display: flex;
-  align-items: center;
   justify-content: center;
-  background-color: #aabbcc;
-  height: 100vh;
+  margin-top: 100px;
 }
 
 .container {
   width: 80%;
-  /* max-width: 688px; */
+  max-width: 688px;
   padding: 16px;
   background-color: #ffffff;
+  background-color: #aabbcc;
 }
 
 .counter {
@@ -183,7 +205,7 @@ const addTask = () => {
   font-size: 48px;
   font-weight: 400;
   font-style: normal;
-  color: #cacaca;
+  color: #ffffff;
   line-height: 1.4;
   transform: translateY(-4px);
 }
